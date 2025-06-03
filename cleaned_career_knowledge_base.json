@@ -1,0 +1,74 @@
+{
+    "django developer": [
+        "css",
+        "deep learning",
+        "django",
+        "excel",
+        "html",
+        "java",
+        "javascript",
+        "machine learning",
+        "numpy",
+        "pandas",
+        "python",
+        "sql"
+    ],
+    "machine learning": [
+        "c++",
+        "css",
+        "deep learning",
+        "excel",
+        "html",
+        "java",
+        "javascript",
+        "machine learning",
+        "numpy",
+        "pandas",
+        "power bi",
+        "python",
+        "sql",
+        "tableau"
+    ],
+    "full stack developer": [
+        "css",
+        "django",
+        "excel",
+        "html",
+        "java",
+        "javascript",
+        "machine learning",
+        "power bi",
+        "python",
+        "sql"
+    ],
+    "javascript developer": [
+        "css",
+        "django",
+        "excel",
+        "html",
+        "java",
+        "javascript",
+        "machine learning",
+        "power bi",
+        "python",
+        "sql",
+        "tableau"
+    ],
+    "devops engineer": [
+        "css",
+        "deep learning",
+        "django",
+        "excel",
+        "html",
+        "java",
+        "javascript",
+        "machine learning",
+        "python",
+        "sql",
+        "tableau"
+    ],
+    "software engineer": [
+        "c++",
+        "css"
+    ]
+}

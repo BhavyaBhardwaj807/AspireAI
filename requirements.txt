@@ -1,0 +1,18 @@
+# Core packages
+streamlit
+pandas
+numpy
+
+# Model handling
+transformers
+torch
+google-generativeai
+
+
+#Plotting
+Matplotlib
+
+#PDF generation 
+fpdf
+
+# JSON & general utilities (standard in Python)
