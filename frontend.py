@@ -167,13 +167,40 @@ if choice == "Career Path Recommendations":
         st.info("Please enter at least one skill to get recommendations.")
 
 # ----------------------------- OTHER SECTIONS -----------------------------
-def load_profile():
+ef load_profile():
     if not os.path.exists("profile.json"):
-        return set()  # No warning here — let the caller handle it
+        return set()
     with open("profile.json", "r") as f:
-        profile_data = json.load(f)
-    user_skills = set(skill.strip().lower() for skill in profile_data.get("skills", "").split(",") if skill.strip())
-    return user_skills
+        data = json.load(f)
+    # Assume skills are stored as a comma-separated string in key "skills"
+    skills_str = data.get("skills", "")
+    skills_set = set(skill.strip().lower() for skill in skills_str.split(",") if skill.strip())
+    return skills_set
+def save_profile(skills_set):
+    import json
+    with open("profile.json", "w") as f:
+        json.dump({"skills": ", ".join(sorted(skills_set))}, f)
+new_skills_str = st.text_input("Enter your skills (comma separated)", key="input_skills")
+
+if new_skills_str:
+    new_skills = set(skill.strip().lower() for skill in new_skills_str.split(",") if skill.strip())
+    st.session_state['user_skills'] = new_skills
+    save_profile(new_skills)
+new_skills_str = st.text_input("Enter your skills (comma separated)", key="input_skills")
+
+def get_user_skills():
+    if 'user_skills' in st.session_state and st.session_state['user_skills']:
+        return st.session_state['user_skills']
+    else:
+        skills = load_profile()
+        if skills:
+            st.session_state['user_skills'] = skills
+            return skills
+        else:
+            st.warning("⚠️ No skills found. Please add your skills first.")
+            st.stop()
+
+
 
 def get_user_skills():
     # 1. Try session state
