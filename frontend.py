@@ -91,34 +91,32 @@ if choice == "Profile & Progress":
         skill_list = [skill.strip() for skill in profile_data.get("skills", "").split(",") if skill.strip()]
 
         # Load progress
-        if os.path.exists(progress_file):
-            with open(progress_file, "r") as f:
-                completed_skills = json.load(f).get("completed_skills", [])
-        else:
-            completed_skills = []
+       if os.path.exists(progress_file):
+    with open(progress_file, "r") as f:
+        completed_skills = json.load(f).get("completed_skills", [])
+else:
+    completed_skills = []
 
-        st.subheader("🌟 Skill Progress Tracker")
-        updated_completed = []
+st.subheader("🌟 Skill Progress Tracker")
+updated_completed = []
 
-        for skill in skill_list:
-            checked = st.checkbox(skill, value=(skill in completed_skills))
-            if checked:
-                updated_completed.append(skill)
+if skill_list:  # Ensure skill_list is defined before
+    for skill in skill_list:
+        checked = st.checkbox(skill, value=(skill in completed_skills))
+        if checked:
+            updated_completed.append(skill)
 
-        # Save updated progress
-        progress_data = {"completed_skills": updated_completed}
-        with open(progress_file, "w") as f:
-            json.dump(progress_data, f, indent=4)
+    # Save updated progress
+    progress_data = {"completed_skills": updated_completed}
+    with open(progress_file, "w") as f:
+        json.dump(progress_data, f, indent=4)
 
-        # Show progress
-        if skill_list:
-            percent_complete = int((len(updated_completed) / len(skill_list)) * 100)
-            st.progress(percent_complete)
-            st.markdown(f"**Skills Completed: {len(updated_completed)} / {len(skill_list)} ({percent_complete}%)**")
-        else:
-            st.info("📜 Add skills in your profile to start tracking progress.")
-    else:
-        st.info("Please fill in your profile to start progress tracking.")
+    # Show progress
+    percent_complete = int((len(updated_completed) / len(skill_list)) * 100)
+    st.progress(percent_complete)
+    st.markdown(f"**Skills Completed: {len(updated_completed)} / {len(skill_list)} ({percent_complete}%)**")
+else:
+    st.info("📜 Add skills in your profile to start tracking progress.")
 
 # ----------------------------- CAREER PATH SECTION -----------------------------
 elif choice == "Career Path":
