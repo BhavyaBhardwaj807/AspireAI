@@ -172,21 +172,13 @@ def load_profile():
         return set()
     with open("profile.json", "r") as f:
         data = json.load(f)
-    # Assume skills are stored as a comma-separated string in key "skills"
     skills_str = data.get("skills", "")
     skills_set = set(skill.strip().lower() for skill in skills_str.split(",") if skill.strip())
     return skills_set
+
 def save_profile(skills_set):
-    import json
     with open("profile.json", "w") as f:
         json.dump({"skills": ", ".join(sorted(skills_set))}, f)
-new_skills_str = st.text_input("Enter your skills (comma separated)", key="input_skills")
-
-if new_skills_str:
-    new_skills = set(skill.strip().lower() for skill in new_skills_str.split(",") if skill.strip())
-    st.session_state['user_skills'] = new_skills
-    save_profile(new_skills)
-new_skills_str = st.text_input("Enter your skills (comma separated)", key="input_skills")
 
 def get_user_skills():
     if 'user_skills' in st.session_state and st.session_state['user_skills']:
@@ -200,26 +192,10 @@ def get_user_skills():
             st.warning("⚠️ No skills found. Please add your skills first.")
             st.stop()
 
-
-
-def get_user_skills():
-    # 1. Try session state
-    user_skills = set(st.session_state.get('user_skills', []))
-
-    # 2. Fallback to profile.json
-    if not user_skills:
-        user_skills = load_profile()
-
-    # 3. If still empty, show warning and stop
-    if not user_skills:
-        st.warning("⚠️ No skills found. Please add your skills first.")
-        st.stop()
-
-    return user_skills
-
-
-
 def load_career_knowledge():
+    if not os.path.exists("career_knowledge_base.json"):
+        st.error("⚠️ career_knowledge_base.json file not found!")
+        st.stop()
     with open("career_knowledge_base.json", "r") as f:
         return json.load(f)
 
@@ -297,15 +273,21 @@ def show_study_planner(missing):
                                file_name="learning_plan.pdf",
                                mime="application/pdf")
 
-import os
-import streamlit as st
+# --------- Main code block ---------
 
-from transformers import pipeline
+choice = "Skill Gap Analysis"  # Set choice manually or get from your app's selectbox/radio
 
 if choice == "Skill Gap Analysis":
     st.markdown("<h2 style='text-align: center;'>Skill Gap & Personalized Resources</h2>", unsafe_allow_html=True)
 
-    # ... Your skill input and save logic here ...
+    # Input skills once
+    new_skills_str = st.text_input("Enter your skills (comma separated)", key="input_skills")
+
+    if new_skills_str:
+        new_skills = set(skill.strip().lower() for skill in new_skills_str.split(",") if skill.strip())
+        st.session_state['user_skills'] = new_skills
+        save_profile(new_skills)
+        st.experimental_rerun()  # Refresh app to update session and UI immediately
 
     user_skills = get_user_skills()
     st.write("📘 Current skills:", user_skills)
@@ -331,7 +313,6 @@ if choice == "Skill Gap Analysis":
     matched_plan, missing_plan = skill_gap(user_skills, required_skills_plan)
 
     show_study_planner(missing_plan)
-
     # Now the AI-generated study plan block, wrapped in try/except
     try:
         if missing_plan:
