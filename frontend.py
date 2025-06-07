@@ -276,7 +276,7 @@ if choice == "Skill Gap Analysis":
     required_skills_plan = set(skill.lower() for skill in role_skills[selected_role_plan])
     matched_plan, missing_plan = skill_gap(user_skills, required_skills_plan)
 
-    show_study_planner(missing_plan)
+    
 
     # Now the AI-generated study plan block, wrapped in try/except
     try:
