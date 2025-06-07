@@ -91,7 +91,7 @@ if choice == "Profile & Progress":
         skill_list = [skill.strip() for skill in profile_data.get("skills", "").split(",") if skill.strip()]
 
         # Load progress
-       if os.path.exists(progress_file):
+if os.path.exists(progress_file):
     with open(progress_file, "r") as f:
         completed_skills = json.load(f).get("completed_skills", [])
 else:
