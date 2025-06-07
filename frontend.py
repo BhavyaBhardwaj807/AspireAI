@@ -280,19 +280,10 @@ def show_study_planner(missing):
 if choice == "Skill Gap Analysis":
     st.markdown("<h2 style='text-align: center;'>Skill Gap & Personalized Resources</h2>", unsafe_allow_html=True)
 
-    # Input skills once
-    with st.form(key="skill_input_form"):
-        new_skills_str = st.text_input("Enter your skills (comma separated)", key="input_skills")
-        submitted = st.form_submit_button("Save Skills")
-
-        if submitted:
-            new_skills = set(skill.strip().lower() for skill in new_skills_str.split(",") if skill.strip())
-            st.session_state['user_skills'] = new_skills
-            save_profile(new_skills)
-            st.success("✅ Skills saved!")
-            st.experimental_rerun()
+    # Show current user skills
     user_skills = get_user_skills()
-    st.write("📘 Current skills:", user_skills)
+    st.markdown("### 📘 Your Current Skills")
+    st.write(user_skills)
 
     role_skills = load_career_knowledge()
 
@@ -315,6 +306,7 @@ if choice == "Skill Gap Analysis":
     matched_plan, missing_plan = skill_gap(user_skills, required_skills_plan)
 
     show_study_planner(missing_plan)
+
     # Now the AI-generated study plan block, wrapped in try/except
     try:
         if missing_plan:
