@@ -44,7 +44,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-menu = ["Profile & Progress", "Career Path", "Skill Gap Analysis", "Network Readiness", "Career Time Capsule"]
+menu = ["Profile & Progress", "Career Path Recommendations", "Skill Gap Analysis", "Network Readiness", "Career Time Capsule"]
 choice = st.sidebar.selectbox("Go to", menu)
 
 # ----------------------------- PROFILE & PROGRESS SECTION -----------------------------
@@ -118,7 +118,7 @@ if choice == "Profile & Progress":
         st.info("📜 Add skills in your profile to start tracking progress.")
 
 # ----------------------------- CAREER PATH SECTION -----------------------------
-if choice == "Career Path":
+if choice == "Career Path Recommendation":
     st.markdown("<h2 style='text-align: center;'>Career Path Recommendations</h2>", unsafe_allow_html=True)
 
     with open("cleaned_career_knowledge_base.json", "r") as f:
