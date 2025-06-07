@@ -282,17 +282,15 @@ if choice == "Skill Gap Analysis":
 
     # Input skills once
     with st.form(key="skill_input_form"):
-    new_skills_str = st.text_input("Enter your skills (comma separated)", key="input_skills")
-    submitted = st.form_submit_button("Save Skills")
+        new_skills_str = st.text_input("Enter your skills (comma separated)", key="input_skills")
+        submitted = st.form_submit_button("Save Skills")
 
-    if submitted:
-        new_skills = set(skill.strip().lower() for skill in new_skills_str.split(",") if skill.strip())
-        st.session_state['user_skills'] = new_skills
-        save_profile(new_skills)
-        st.success("✅ Skills saved!")
-        st.experimental_rerun()
- 
-
+        if submitted:
+            new_skills = set(skill.strip().lower() for skill in new_skills_str.split(",") if skill.strip())
+            st.session_state['user_skills'] = new_skills
+            save_profile(new_skills)
+            st.success("✅ Skills saved!")
+            st.experimental_rerun()
     user_skills = get_user_skills()
     st.write("📘 Current skills:", user_skills)
 
