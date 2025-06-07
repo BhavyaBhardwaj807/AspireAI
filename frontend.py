@@ -281,13 +281,17 @@ if choice == "Skill Gap Analysis":
     st.markdown("<h2 style='text-align: center;'>Skill Gap & Personalized Resources</h2>", unsafe_allow_html=True)
 
     # Input skills once
+    with st.form(key="skill_input_form"):
     new_skills_str = st.text_input("Enter your skills (comma separated)", key="input_skills")
+    submitted = st.form_submit_button("Save Skills")
 
-    if new_skills_str:
+    if submitted:
         new_skills = set(skill.strip().lower() for skill in new_skills_str.split(",") if skill.strip())
         st.session_state['user_skills'] = new_skills
         save_profile(new_skills)
-        st.experimental_rerun()  # Refresh app to update session and UI immediately
+        st.success("✅ Skills saved!")
+        st.experimental_rerun()
+ 
 
     user_skills = get_user_skills()
     st.write("📘 Current skills:", user_skills)
