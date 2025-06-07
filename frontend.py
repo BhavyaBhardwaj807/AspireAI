@@ -171,10 +171,17 @@ def load_profile():
     if not os.path.exists("profile.json"):
         st.warning("⚠️ Please complete your profile first.")
         st.stop()
-    with open("profile.json", "r") as f:
-        profile_data = json.load(f)
-    user_skills = set(skill.strip().lower() for skill in profile_data.get("skills", "").split(",") if skill.strip())
-    return user_skills
+   # Use session state if available
+   user_skills = set(st.session_state.get('user_skills', []))
+
+# Fallback to profile.json if session state is empty
+   if not user_skills:
+       user_skills = load_profile()
+
+   if not user_skills:
+       st.warning("⚠️ No skills found. Please add your skills first.")
+       st.stop()
+
 
 def load_career_knowledge():
     with open("career_knowledge_base.json", "r") as f:
