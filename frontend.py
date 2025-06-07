@@ -119,7 +119,7 @@ else:
     st.info("📜 Add skills in your profile to start tracking progress.")
 
 # ----------------------------- CAREER PATH SECTION -----------------------------
-elif choice == "Career Path":
+if choice == "Career Path":
     st.markdown("<h2 style='text-align: center;'>Career Path Recommendations</h2>", unsafe_allow_html=True)
 
     with open("cleaned_career_knowledge_base.json", "r") as f:
