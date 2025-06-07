@@ -278,63 +278,61 @@ from transformers import pipeline
 if choice == "Skill Gap Analysis":
     st.markdown("<h2 style='text-align: center;'>Skill Gap & Personalized Resources</h2>", unsafe_allow_html=True)
 
-    '''try:
-        user_skills = set(st.session_state.get('user_skills', []))
+    # Skill input text box for users to update their skills
+    new_skills_str = st.text_input("Enter your skills (comma separated)", key="input_skills")
 
+    if new_skills_str:
+        # Update session state with cleaned skill set
+        st.session_state['user_skills'] = set(
+            skill.strip().lower() for skill in new_skills_str.split(",") if skill.strip()
+        )
+
+        # Optional: save back to profile.json for persistence
+        def save_profile(skills_set):
+            import json
+            with open("profile.json", "w") as f:
+                json.dump({"skills": ", ".join(sorted(skills_set))}, f)
+
+        save_profile(st.session_state['user_skills'])
+
+    # Function to get current user skills, either from session or from file fallback
+    def get_user_skills():
+        user_skills = set(st.session_state.get('user_skills', []))
         if not user_skills:
             user_skills = load_profile()
-
+            if user_skills:
+                st.session_state['user_skills'] = user_skills  # Cache loaded skills in session state
         if not user_skills:
             st.warning("⚠️ No skills found. Please add your skills first.")
             st.stop()
-        st.write("📘 Current skills:", user_skills)'''
-    import streamlit as st
+        return user_skills
 
-# Skill input text box for users to update their skills
-new_skills_str = st.text_input("Enter your skills (comma separated)", key="input_skills")
+    user_skills = get_user_skills()
+    st.write("📘 Current skills:", user_skills)
 
-if new_skills_str:
-    # Update session state with cleaned skill set
-    st.session_state['user_skills'] = set(skill.strip().lower() for skill in new_skills_str.split(",") if skill.strip())
+    role_skills = load_career_knowledge()
 
-    # Optional: save back to profile.json for persistence
-    def save_profile(skills_set):
-        import json
-        with open("profile.json", "w") as f:
-            json.dump({"skills": ", ".join(sorted(skills_set))}, f)
+    selected_role = st.selectbox("🎯 Select a Career Role", list(role_skills.keys()), key="skill_gap_role")
+    st.write("🎯 Selected Role:", selected_role)
 
-    save_profile(st.session_state['user_skills'])
-def get_user_skills():
-    user_skills = set(st.session_state.get('user_skills', []))
-    if not user_skills:
-        user_skills = load_profile()
-        if user_skills:
-            st.session_state['user_skills'] = user_skills  # Cache loaded skills in session state
-    if not user_skills:
-        st.warning("⚠️ No skills found. Please add your skills first.")
-        st.stop()
-    return user_skills
+    required_skills = set(skill.lower() for skill in role_skills[selected_role])
+    matched, missing = skill_gap(user_skills, required_skills)
+    st.write("✅ Matched:", matched)
+    st.write("❌ Missing:", missing)
 
+    show_skill_gap_analysis(matched, missing)
+    show_learning_resources(missing)
 
-        role_skills = load_career_knowledge()
-        
-        selected_role = st.selectbox("🎯 Select a Career Role", list(role_skills.keys()), key="skill_gap_role")
-        st.write("🎯 Selected Role:", selected_role)
+    st.markdown("---")
+    st.markdown("## Weekly Study Planner")
 
-        required_skills = set(skill.lower() for skill in role_skills[selected_role])
-        matched, missing = skill_gap(user_skills, required_skills)
-        st.write("✅ Matched:", matched)
-        st.write("❌ Missing:", missing)
+    selected_role_plan = st.selectbox("🎯 Select a Career Role for Study Plan", list(role_skills.keys()), key="study_plan_role")
+    required_skills_plan = set(skill.lower() for skill in role_skills[selected_role_plan])
+    matched_plan, missing_plan = skill_gap(user_skills, required_skills_plan)
 
-        show_skill_gap_analysis(matched, missing)
-        show_learning_resources(missing)
+    # You can also show the study planner here using missing_plan
+    show_study_planner(missing_plan)
 
-        st.markdown("---")
-        st.markdown("## Weekly Study Planner")
-
-        selected_role_plan = st.selectbox("🎯 Select a Career Role for Study Plan", list(role_skills.keys()), key="study_plan_role")
-        required_skills_plan = set(skill.lower() for skill in role_skills[selected_role_plan])
-        matched_plan, missing_plan = skill_gap(user_skills, required_skills_plan)
 
         if missing_plan:
             st.subheader("🤖 AI-Generated Study Plan")
