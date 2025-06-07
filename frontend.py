@@ -242,36 +242,7 @@ def show_learning_resources(missing):
         else:
             st.markdown(f"- ❓ **{skill.title()}**: No resource available yet.")
 
-def show_study_planner(missing):
-    st.subheader("🗓️ Weekly Study Planner")
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    study_plan = {}
-    for i, skill in enumerate(sorted(missing)):
-        day = days[i % 7]
-        study_plan.setdefault(day, []).append(skill)
 
-    for day in days:
-        if day in study_plan:
-            st.markdown(f"**{day}**: {', '.join(study_plan[day])}")
-
-    if st.button("📥 Download Learning Plan as PDF"):
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
-        pdf.cell(200, 10, txt="AspireAI - Weekly Learning Plan", ln=True, align="C")
-        pdf.ln(10)
-
-        for day in days:
-            if day in study_plan:
-                skills_line = ", ".join(study_plan[day])
-                pdf.cell(200, 10, txt=f"{day}: {skills_line}", ln=True)
-
-        pdf.output("learning_plan.pdf")
-        with open("learning_plan.pdf", "rb") as file:
-            st.download_button(label="📄 Click to Download PDF",
-                               data=file,
-                               file_name="learning_plan.pdf",
-                               mime="application/pdf")
 
 # --------- Main code block ---------
 
