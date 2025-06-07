@@ -278,16 +278,15 @@ from transformers import pipeline
 if choice == "Skill Gap Analysis":
     st.markdown("<h2 style='text-align: center;'>Skill Gap & Personalized Resources</h2>", unsafe_allow_html=True)
     
-    try:
+   try:
     user_skills = set(st.session_state.get('user_skills', []))
-
 
     if not user_skills:
         user_skills = load_profile()
 
-   if not user_skills:
-       st.warning("⚠️ No skills found. Please add your skills first.")
-       st.stop()
+    if not user_skills:
+        st.warning("⚠️ No skills found. Please add your skills first.")
+        st.stop()
 
         st.write("📘 Current skills:", user_skills)
 
