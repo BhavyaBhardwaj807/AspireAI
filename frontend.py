@@ -49,9 +49,8 @@ choice = st.sidebar.selectbox("Go to", menu)
 
 # ----------------------------- PROFILE & PROGRESS SECTION -----------------------------
 if choice == "Profile & Progress":
-    st.markdown("<h2 style='text-align: center; '>Profile and Progress Tracking </h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center;'>Profile and Progress Tracking</h2>", unsafe_allow_html=True)
     profile_file = "profile.json"
-    progress_file = "progress.json"
 
     # ---- FORM FOR USER PROFILE ----
     with st.form("user_profile_form"):
@@ -73,21 +72,22 @@ if choice == "Profile & Progress":
         }
         with open(profile_file, "w") as f:
             json.dump(profile_data, f, indent=4)
-
         st.success("✅ Profile Saved Successfully!")
 
-    # ---- LOAD PROFILE (saved or just submitted) ----
+    # ---- LOAD AND DISPLAY PROFILE ----
     if os.path.exists(profile_file):
         with open(profile_file, "r") as f:
             profile_data = json.load(f)
 
         st.subheader("📋 Your Profile Summary")
-        st.markdown(f"Name: {st.session_state.profile_data.get('name', 'Not provided')}")
-        st.markdown(f"Education: {st.session_state.profile_data.get('education', 'Not provided')}")
-        st.markdown(f"Skills: {st.session_state.profile_data.get('skills', 'Not provided')}")
-        st.markdown(f"Interests: {st.session_state.profile_data.get('interests', 'Not provided')}")
-        st.markdown(f"Career Goals: {st.session_state.profile_data.get('goals', 'Not provided')}")
-        # ---- SKILL TRACKER ----
+        st.markdown(f"**Name:** {profile_data.get('name', 'Not provided')}")
+        st.markdown(f"**Education:** {profile_data.get('education', 'Not provided')}")
+        st.markdown(f"**Skills:** {profile_data.get('skills', 'Not provided')}")
+        st.markdown(f"**Interests:** {profile_data.get('interests', 'Not provided')}")
+        st.markdown(f"**Career Goals:** {profile_data.get('goals', 'Not provided')}")
+    else:
+        st.info("Please fill in your profile to view your summary.")
+
         skill_list = [skill.strip() for skill in profile_data.get("skills", "").split(",") if skill.strip()]
 
         # Load progress
