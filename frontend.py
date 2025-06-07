@@ -278,7 +278,7 @@ from transformers import pipeline
 if choice == "Skill Gap Analysis":
     st.markdown("<h2 style='text-align: center;'>Skill Gap & Personalized Resources</h2>", unsafe_allow_html=True)
 
-    try:
+    '''try:
         user_skills = set(st.session_state.get('user_skills', []))
 
         if not user_skills:
@@ -287,7 +287,34 @@ if choice == "Skill Gap Analysis":
         if not user_skills:
             st.warning("⚠️ No skills found. Please add your skills first.")
             st.stop()
-        st.write("📘 Current skills:", user_skills)
+        st.write("📘 Current skills:", user_skills)'''
+    import streamlit as st
+
+# Skill input text box for users to update their skills
+new_skills_str = st.text_input("Enter your skills (comma separated)", key="input_skills")
+
+if new_skills_str:
+    # Update session state with cleaned skill set
+    st.session_state['user_skills'] = set(skill.strip().lower() for skill in new_skills_str.split(",") if skill.strip())
+
+    # Optional: save back to profile.json for persistence
+    def save_profile(skills_set):
+        import json
+        with open("profile.json", "w") as f:
+            json.dump({"skills": ", ".join(sorted(skills_set))}, f)
+
+    save_profile(st.session_state['user_skills'])
+def get_user_skills():
+    user_skills = set(st.session_state.get('user_skills', []))
+    if not user_skills:
+        user_skills = load_profile()
+        if user_skills:
+            st.session_state['user_skills'] = user_skills  # Cache loaded skills in session state
+    if not user_skills:
+        st.warning("⚠️ No skills found. Please add your skills first.")
+        st.stop()
+    return user_skills
+
 
         role_skills = load_career_knowledge()
         
