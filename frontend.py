@@ -275,7 +275,7 @@ def show_study_planner(missing):
 
 # --------- Main code block ---------
 
-choice = "Skill Gap Analysis"  # Set choice manually or get from your app's selectbox/radio
+
 
 if choice == "Skill Gap Analysis":
     st.markdown("<h2 style='text-align: center;'>Skill Gap & Personalized Resources</h2>", unsafe_allow_html=True)
