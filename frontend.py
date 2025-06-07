@@ -167,7 +167,7 @@ if choice == "Career Path Recommendations":
         st.info("Please enter at least one skill to get recommendations.")
 
 # ----------------------------- OTHER SECTIONS -----------------------------
-ef load_profile():
+def load_profile():
     if not os.path.exists("profile.json"):
         return set()
     with open("profile.json", "r") as f:
