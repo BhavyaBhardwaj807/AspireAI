@@ -169,18 +169,27 @@ if choice == "Career Path Recommendations":
 # ----------------------------- OTHER SECTIONS -----------------------------
 def load_profile():
     if not os.path.exists("profile.json"):
-        st.warning("⚠️ Please complete your profile first.")
+        return set()  # No warning here — let the caller handle it
+    with open("profile.json", "r") as f:
+        profile_data = json.load(f)
+    user_skills = set(skill.strip().lower() for skill in profile_data.get("skills", "").split(",") if skill.strip())
+    return user_skills
+
+def get_user_skills():
+    # 1. Try session state
+    user_skills = set(st.session_state.get('user_skills', []))
+
+    # 2. Fallback to profile.json
+    if not user_skills:
+        user_skills = load_profile()
+
+    # 3. If still empty, show warning and stop
+    if not user_skills:
+        st.warning("⚠️ No skills found. Please add your skills first.")
         st.stop()
-   # Use session state if available
-   user_skills = set(st.session_state.get('user_skills', []))
 
-# Fallback to profile.json if session state is empty
-   if not user_skills:
-       user_skills = load_profile()
+    return user_skills
 
-   if not user_skills:
-       st.warning("⚠️ No skills found. Please add your skills first.")
-       st.stop()
 
 
 def load_career_knowledge():
