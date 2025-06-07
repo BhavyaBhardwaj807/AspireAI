@@ -101,8 +101,9 @@ else:
 
 st.subheader("🌟 Skill Progress Tracker")
 updated_completed = []
+skill_list = [skill.strip() for skill in profile_data.get("skills", "").split(",") if skill.strip()]
 
-if skill_list:  # Ensure skill_list is defined before
+if skill_list:  
     for skill in skill_list:
         checked = st.checkbox(skill, value=(skill in completed_skills))
         if checked:
