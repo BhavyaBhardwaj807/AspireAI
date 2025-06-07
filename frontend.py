@@ -47,81 +47,88 @@ st.markdown(
 menu = ["Profile & Progress", "Career Path", "Skill Gap Analysis", "Network Readiness", "Career Time Capsule"]
 choice = st.sidebar.selectbox("Go to", menu)
 
+if "profile_data" not in st.session_state:
+    st.session_state.profile_data = {
+        "name": "",
+        "education": "",
+        "skills": "",
+        "interests": "",
+        "goals": ""
+    }
+
+
 # ----------------------------- PROFILE & PROGRESS SECTION -----------------------------
 if choice == "Profile & Progress":
-    st.markdown("<h2 style='text-align: center; '>Profile and Progress Tracking </h2>", unsafe_allow_html=True)
-    profile_file = "profile.json"
-    progress_file = "progress.json"
+    st.markdown("<h2 style='text-align: center;'>Profile and Progress Tracking</h2>", unsafe_allow_html=True)
 
-    # ---- FORM FOR USER PROFILE ----
+    # ✅ Always initialize session state values before usage
+    if "profile_data" not in st.session_state:
+        st.session_state.profile_data = {
+            "name": "",
+            "education": "",
+            "skills": "",
+            "interests": "",
+            "goals": ""
+        }
+
+    if "completed_skills" not in st.session_state:
+        st.session_state.completed_skills = []
+
+    # ✅ Alias for cleaner code
+    profile_data = st.session_state.profile_data
+
+    # 🧾 User Profile Form
     with st.form("user_profile_form"):
-        name = st.text_input("Your Name")
-        education = st.text_input("Your Education (e.g., B.Tech in CSE)")
-        skills = st.text_area("List Your Skills (comma-separated)")
-        interests = st.text_area("Your Interests (e.g., AI, Web Dev, Data Science)")
-        goals = st.text_area("Your Career Goals")
+        name = st.text_input("Your Name", profile_data["name"])
+        education = st.text_input("Your Education (e.g., B.Tech in CSE)", profile_data["education"])
+        skills = st.text_area("List Your Skills (comma-separated)", profile_data["skills"])
+        interests = st.text_area("Your Interests (e.g., AI, Web Dev, Data Science)", profile_data["interests"])
+        goals = st.text_area("Your Career Goals", profile_data["goals"])
         submitted = st.form_submit_button("Save Profile")
 
-    # ---- SAVE PROFILE ----
+    # 💾 Save to session state
     if submitted:
-        profile_data = {
+        st.session_state.profile_data = {
             "name": name,
             "education": education,
             "skills": skills,
             "interests": interests,
             "goals": goals
         }
-        with open(profile_file, "w") as f:
-            json.dump(profile_data, f, indent=4)
-
+        st.session_state.completed_skills = []  # Reset
         st.success("✅ Profile Saved Successfully!")
 
-    # ---- LOAD PROFILE (saved or just submitted) ----
-    if os.path.exists(profile_file):
-        with open(profile_file, "r") as f:
-            profile_data = json.load(f)
+    # 📋 Show profile data safely
+    profile_data = st.session_state.profile_data
+    st.markdown(f"**Name:** {profile_data.get('name', 'Not provided')}")
+    st.markdown(f"**Education:** {profile_data.get('education', 'Not provided')}")
+    st.markdown(f"**Skills:** {profile_data.get('skills', 'Not provided')}")
+    st.markdown(f"**Interests:** {profile_data.get('interests', 'Not provided')}")
+    st.markdown(f"**Career Goals:** {profile_data.get('goals', 'Not provided')}")
 
-        st.subheader("📋 Your Profile Summary")
-        st.markdown(f"Name: {profile_data.get('name', 'Not provided')}")
-        st.markdown(f"Education: {profile_data.get('education', 'Not provided')}")
-        st.markdown(f"Skills: {profile_data.get('skills', 'Not provided')}")
-        st.markdown(f"Interests: {profile_data.get('interests', 'Not provided')}")
-        st.markdown(f"Career Goals: {profile_data.get('goals', 'Not provided')}")
-        # ---- SKILL TRACKER ----
-        skill_list = [skill.strip() for skill in profile_data.get("skills", "").split(",") if skill.strip()]
+    skill_list = [skill.strip() for skill in st.session_state.profile_data.get("skills", "").split(",") if skill.strip()]
 
-        # Load progress
-        if os.path.exists(progress_file):
-            with open(progress_file, "r") as f:
-                completed_skills = json.load(f).get("completed_skills", [])
-        else:
-            completed_skills = []
-
+    if skill_list:
         st.subheader("🌟 Skill Progress Tracker")
         updated_completed = []
 
         for skill in skill_list:
-            checked = st.checkbox(skill, value=(skill in completed_skills))
+            checked = st.checkbox(skill, value=(skill in st.session_state.completed_skills))
             if checked:
                 updated_completed.append(skill)
 
-        # Save updated progress
-        progress_data = {"completed_skills": updated_completed}
-        with open(progress_file, "w") as f:
-            json.dump(progress_data, f, indent=4)
+        # Update session state with current completed skills
+        st.session_state.completed_skills = updated_completed
 
-        # Show progress
-        if skill_list:
-            percent_complete = int((len(updated_completed) / len(skill_list)) * 100)
-            st.progress(percent_complete)
-            st.markdown(f"**Skills Completed: {len(updated_completed)} / {len(skill_list)} ({percent_complete}%)**")
-        else:
-            st.info("📜 Add skills in your profile to start tracking progress.")
+        # Show progress bar and stats
+        percent_complete = int((len(updated_completed) / len(skill_list)) * 100)
+        st.progress(percent_complete)
+        st.markdown(f"**Skills Completed: {len(updated_completed)} / {len(skill_list)} ({percent_complete}%)**")
     else:
-        st.info("Please fill in your profile to start progress tracking.")
+        st.info("📜 Add skills in your profile to start tracking progress.")
 
 # ----------------------------- CAREER PATH SECTION -----------------------------
-elif choice == "Career Path":
+elif choice == "Career Path REcommendations":
     st.markdown("<h2 style='text-align: center;'>Career Path Recommendations</h2>", unsafe_allow_html=True)
 
     with open("cleaned_career_knowledge_base.json", "r") as f:
@@ -298,7 +305,7 @@ if choice == "Skill Gap Analysis":
                         import google.generativeai as genai
 
                         # Secure your key via environment variable or st.secrets
-                        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])  # or os.getenv("GEMINI_API_KEY")
+                        genai.configure(api_key = os.environ.get("GEMINI_API_KEY"))  # or os.getenv("GEMINI_API_KEY")
 
                         skills_text = ', '.join(missing_plan)
                         prompt = (
@@ -473,3 +480,26 @@ elif choice == "Career Time Capsule":
         """
 
         st.download_button("📥 Download Capsule", data=capsule_text, file_name="career_time_capsule.txt", mime="text/plain")
+
+
+
+      
+      
+
+     
+
+          
+      
+   
+
+ 
+      
+                      
+
+
+
+                  
+     
+        
+       
+     
