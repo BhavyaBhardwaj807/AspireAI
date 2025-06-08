@@ -125,57 +125,52 @@ if choice == "Career Path Recommendations":
         job_skills = json.load(f)
 
     # User skill input
-    user_skills = st.text_area("Enter your skills (comma-separated)").lower().split(",")
-    user_skills = [skill.strip() for skill in user_skills if skill.strip()]
-    skills = [skill.strip().lower() for skill in user_input_skills if skill.strip()]
-    
+    user_input = st.text_area("Enter your skills (comma-separated)")
+    user_skills = [skill.strip().lower() for skill in user_input.split(",") if skill.strip()]
 
     if st.button("Suggest Career Paths") and user_skills:
-    # ✅ Save to session and profile so Skill Gap section works
-    st.session_state['user_skills'] = skills
-    profile_data = {"skills": ", ".join(skills)}
-    with open("profile.json", "w") as f:
-        json.dump(profile_data, f)
-    
+        # ✅ Save to session and profile
+        st.session_state['user_skills'] = user_skills
+        profile_data = {"skills": ", ".join(user_skills)}
+        with open("profile.json", "w") as f:
+            json.dump(profile_data, f)
 
-    scores = []
-    match_details = {}
+        scores = []
+        match_details = {}
 
-    for role, required_skills in job_skills.items():
-        req_set = set(required_skills)
-        user_set = set(user_skills)
+        for role, required_skills in job_skills.items():
+            req_set = set(required_skills)
+            user_set = set(user_skills)
 
-        matched = user_set & req_set
-        missing = req_set - user_set
-        match_ratio = len(matched) / len(req_set) if req_set else 0
+            matched = user_set & req_set
+            missing = req_set - user_set
+            match_ratio = len(matched) / len(req_set) if req_set else 0
 
-        scores.append((role, match_ratio))
-        match_details[role] = {"match": matched, "missing": missing}
+            scores.append((role, match_ratio))
+            match_details[role] = {"match": matched, "missing": missing}
 
-    # Sort and get top 5
-    top_roles = sorted(scores, key=lambda x: x[1], reverse=True)[:5]
+        # Sort and get top 5
+        top_roles = sorted(scores, key=lambda x: x[1], reverse=True)[:5]
 
-    # Bar chart
-    df = pd.DataFrame(top_roles, columns=["Role", "Match %"])
-    df["Match %"] = df["Match %"] * 100  # convert to %
-    st.subheader("📊 Match Score Chart")
-    st.bar_chart(data=df.set_index("Role"))
+        # Bar chart
+        df = pd.DataFrame(top_roles, columns=["Role", "Match %"])
+        df["Match %"] = df["Match %"] * 100  # convert to %
+        st.subheader("📊 Match Score Chart")
+        st.bar_chart(data=df.set_index("Role"))
 
-    # Detailed breakdown
-    st.subheader("🧠 Recommendations & Missing Skills")
-    for role, score in top_roles:
-        percent = round(score * 100)
-        matched = match_details[role]["match"]
-        missing = match_details[role]["missing"]
+        # Detailed breakdown
+        st.subheader("🧠 Recommendations & Missing Skills")
+        for role, score in top_roles:
+            percent = round(score * 100)
+            matched = match_details[role]["match"]
+            missing = match_details[role]["missing"]
 
-        st.markdown(f"### 🔹 {role.title()} — {percent}% Match")
-        st.markdown(f"- ✅ **Matched Skills:** {', '.join(sorted(matched)) if matched else 'None'}")
-        st.markdown(f"- ❌ **Missing Skills to Learn:** {', '.join(sorted(missing)) if missing else 'None'}")
-        st.markdown("---")
-
+            st.markdown(f"### 🔹 {role.title()} — {percent}% Match")
+            st.markdown(f"- ✅ **Matched Skills:** {', '.join(sorted(matched)) if matched else 'None'}")
+            st.markdown(f"- ❌ **Missing Skills to Learn:** {', '.join(sorted(missing)) if missing else 'None'}")
+            st.markdown("---")
     else:
         st.info("Please enter at least one skill to get recommendations.")
-
 # ----------------------------- OTHER SECTIONS -----------------------------
 def load_profile():
     if not os.path.exists("profile.json"):
@@ -261,8 +256,6 @@ def show_learning_resources(missing):
 if choice == "Skill Gap Analysis":
     st.markdown("<h2 style='text-align: center;'>Skill Gap & Personalized Resources</h2>", unsafe_allow_html=True)
 
-   
-
     user_skills = get_user_skills()
     st.markdown("### 📘 Your Current Skills")
     st.write(user_skills)
@@ -273,7 +266,7 @@ if choice == "Skill Gap Analysis":
     st.write("🎯 Selected Role:", selected_role)
 
     required_skills = set(skill.lower() for skill in role_skills[selected_role])
-    matched, missing = skill_gap(user_skills, required_skills)
+    matched, missing = skill_gap(set(user_skills), required_skills)
     st.write("✅ Matched:", matched)
     st.write("❌ Missing:", missing)
 
@@ -285,8 +278,7 @@ if choice == "Skill Gap Analysis":
 
     selected_role_plan = st.selectbox("🎯 Select a Career Role for Study Plan", list(role_skills.keys()), key="study_plan_role")
     required_skills_plan = set(skill.lower() for skill in role_skills[selected_role_plan])
-    matched_plan, missing_plan = skill_gap(user_skills, required_skills_plan)
-
+    matched_plan, missing_plan = skill_gap(set(user_skills), required_skills_plan)
     
 
     # Now the AI-generated study plan block, wrapped in try/except
