@@ -251,7 +251,21 @@ def show_learning_resources(missing):
 if choice == "Skill Gap Analysis":
     st.markdown("<h2 style='text-align: center;'>Skill Gap & Personalized Resources</h2>", unsafe_allow_html=True)
 
-    # Show current user skills
+    user_input_skills = st.text_input("Enter your current skills (comma-separated):")
+
+    if st.button("Save Skills"):
+        skills = [skill.strip().lower() for skill in user_input_skills.split(",") if skill.strip()]
+    
+    # ✅ Save to session state
+    st.session_state['user_skills'] = skills
+    
+    # ✅ Save to profile.json
+    profile_data = {"skills": ",".join(skills)}
+    with open("profile.json", "w") as f:
+        json.dump(profile_data, f)
+
+    st.success("✅ Skills saved!")
+
     user_skills = get_user_skills()
     st.markdown("### 📘 Your Current Skills")
     st.write(user_skills)
