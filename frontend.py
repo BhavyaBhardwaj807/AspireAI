@@ -127,42 +127,51 @@ if choice == "Career Path Recommendations":
     # User skill input
     user_skills = st.text_area("Enter your skills (comma-separated)").lower().split(",")
     user_skills = [skill.strip() for skill in user_skills if skill.strip()]
+    # Save to session state and profile
+    st.session_state['user_skills'] = user_skills
+    save_profile(set(user_skills))
+
 
     if st.button("Suggest Career Paths") and user_skills:
-        scores = []
-        match_details = {}
+    # ✅ Save to session and profile so Skill Gap section works
+    st.session_state['user_skills'] = user_skills
+    save_profile(set(user_skills))
 
-        for role, required_skills in job_skills.items():
-            req_set = set(required_skills)
-            user_set = set(user_skills)
+    scores = []
+    match_details = {}
 
-            matched = user_set & req_set
-            missing = req_set - user_set
-            match_ratio = len(matched) / len(req_set) if req_set else 0
+    for role, required_skills in job_skills.items():
+        req_set = set(required_skills)
+        user_set = set(user_skills)
 
-            scores.append((role, match_ratio))
-            match_details[role] = {"match": matched, "missing": missing}
+        matched = user_set & req_set
+        missing = req_set - user_set
+        match_ratio = len(matched) / len(req_set) if req_set else 0
 
-        # Sort and get top 5
-        top_roles = sorted(scores, key=lambda x: x[1], reverse=True)[:5]
+        scores.append((role, match_ratio))
+        match_details[role] = {"match": matched, "missing": missing}
 
-        # Bar chart
-        df = pd.DataFrame(top_roles, columns=["Role", "Match %"])
-        df["Match %"] = df["Match %"] * 100  # convert to %
-        st.subheader("📊 Match Score Chart")
-        st.bar_chart(data=df.set_index("Role"))
+    # Sort and get top 5
+    top_roles = sorted(scores, key=lambda x: x[1], reverse=True)[:5]
 
-        # Detailed breakdown
-        st.subheader("🧠 Recommendations & Missing Skills")
-        for role, score in top_roles:
-            percent = round(score * 100)
-            matched = match_details[role]["match"]
-            missing = match_details[role]["missing"]
+    # Bar chart
+    df = pd.DataFrame(top_roles, columns=["Role", "Match %"])
+    df["Match %"] = df["Match %"] * 100  # convert to %
+    st.subheader("📊 Match Score Chart")
+    st.bar_chart(data=df.set_index("Role"))
 
-            st.markdown(f"### 🔹 {role.title()} — {percent}% Match")
-            st.markdown(f"- ✅ **Matched Skills:** {', '.join(sorted(matched)) if matched else 'None'}")
-            st.markdown(f"- ❌ **Missing Skills to Learn:** {', '.join(sorted(missing)) if missing else 'None'}")
-            st.markdown("---")
+    # Detailed breakdown
+    st.subheader("🧠 Recommendations & Missing Skills")
+    for role, score in top_roles:
+        percent = round(score * 100)
+        matched = match_details[role]["match"]
+        missing = match_details[role]["missing"]
+
+        st.markdown(f"### 🔹 {role.title()} — {percent}% Match")
+        st.markdown(f"- ✅ **Matched Skills:** {', '.join(sorted(matched)) if matched else 'None'}")
+        st.markdown(f"- ❌ **Missing Skills to Learn:** {', '.join(sorted(missing)) if missing else 'None'}")
+        st.markdown("---")
+
     else:
         st.info("Please enter at least one skill to get recommendations.")
 
@@ -251,20 +260,7 @@ def show_learning_resources(missing):
 if choice == "Skill Gap Analysis":
     st.markdown("<h2 style='text-align: center;'>Skill Gap & Personalized Resources</h2>", unsafe_allow_html=True)
 
-    user_input_skills = st.text_input("Enter your current skills (comma-separated):")
-
-    if st.button("Save Skills"):
-        skills = [skill.strip().lower() for skill in user_input_skills.split(",") if skill.strip()]
-    
-    # ✅ Save to session state
-    st.session_state['user_skills'] = skills
-    
-    # ✅ Save to profile.json
-    profile_data = {"skills": ",".join(skills)}
-    with open("profile.json", "w") as f:
-        json.dump(profile_data, f)
-
-    st.success("✅ Skills saved!")
+   
 
     user_skills = get_user_skills()
     st.markdown("### 📘 Your Current Skills")
