@@ -127,15 +127,16 @@ if choice == "Career Path Recommendations":
     # User skill input
     user_skills = st.text_area("Enter your skills (comma-separated)").lower().split(",")
     user_skills = [skill.strip() for skill in user_skills if skill.strip()]
-    # Save to session state and profile
-    st.session_state['user_skills'] = user_skills
-    save_profile(set(user_skills))
-
+    skills = [skill.strip().lower() for skill in user_input_skills if skill.strip()]
+    
 
     if st.button("Suggest Career Paths") and user_skills:
     # ✅ Save to session and profile so Skill Gap section works
-    st.session_state['user_skills'] = user_skills
-    save_profile(set(user_skills))
+    st.session_state['user_skills'] = skills
+    profile_data = {"skills": ", ".join(skills)}
+    with open("profile.json", "w") as f:
+        json.dump(profile_data, f)
+    
 
     scores = []
     match_details = {}
